@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menta y Amor</title>
+<style>
+/* GLOBAL */
+body{
+    font-family: Arial;
+    margin:0;
+    background: linear-gradient(135deg,#c8f7d4,#e9fff2);
+}
+
+/* LOGIN */
+.login{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:#27ae60;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    z-index:10;
+}
+.login h1{
+    font-size:60px;
+    margin-bottom:20px;
+}
+.login input{
+    padding:10px;
+    margin:5px;
+    border:none;
+    border-radius:6px;
+}
+
+/* HEADER */
+header{
+    background:#1e8449;
+    color:white;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.logo{
+    font-size:26px;
+    font-weight:bold;
+}
+#iconoCarrito{
+    cursor:pointer;
+}
+#contadorCarrito{
+    background:red;
+    border-radius:50%;
+    padding:3px 7px;
+    font-size:14px;
+}
+
+/* PRODUCTOS */
+.container{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:40px;
+    padding:40px;
+}
+.producto{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    text-align:center;
+    width:250px;
+    box-shadow:0 10px 20px rgba(0,0,0,0.2);
+}
+.producto img{
+    width:170px;
+}
+button{
+    background:#2ecc71;
+    border:none;
+    padding:10px;
+    border-radius:6px;
+    color:white;
+    cursor:pointer;
+    margin:5px;
+    transition:0.3s;
+}
+button:hover{
+    background:#27ae60;
+}
+
+/* CARRITO */
+.carrito{
+    position:fixed;
+    top:50px; right:50px;
+    width:300px;
+    max-height:70%;
+    background: linear-gradient(135deg,#e0f7ef,#b8f2d1);
+    border-radius:12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    display:none;
+    padding:20px;
+    overflow:auto;
+}
+
+/* PAGO MODAL */
+.pago{
+    position:fixed;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.4);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:100;
+}
+.pago-contenido{
+    background: linear-gradient(135deg,#e0f7ef,#b8f2d1);
+    padding:30px 40px;
+    border-radius:15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-width:400px;
+    width:90%;
+    text-align:center;
+    animation: fadeIn 0.4s ease;
+}
+.pago-contenido input{
+    width:90%;
+    padding:10px;
+    margin:8px 0;
+    border:none;
+    border-radius:6px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+}
+.pago-contenido button{
+    width:45%;
+    margin:8px 2%;
+    background:#2ecc71;
+    border:none;
+    padding:10px;
+    border-radius:6px;
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+}
+.pago-contenido button:hover{
+    background:#27ae60;
+}
+
+/* MODAL PRODUCTO */
+.modalProducto{
+    position:fixed;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.5);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:200;
+}
+.modalContenido{
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    max-width:400px;
+    width:90%;
+    text-align:center;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+    transform: scale(0.7);
+    opacity:0;
+    transition:0.3s ease;
+}
+.modalProducto.show .modalContenido{
+    transform: scale(1);
+    opacity:1;
+}
+.modalContenido img{
+    max-width:100%;
+    margin-bottom:15px;
+}
+
+/* RESEÑAS */
+.reseñas{
+    background:white;
+    padding:40px;
+    text-align:center;
+}
+.review{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#f4fff7;
+    padding:10px;
+    margin:10px auto;
+    max-width:500px;
+    border-radius:10px;
+}
+.review img{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+}
+.estrellas{
+    color:gold;
+}
+
+/* MODAL TOAST */
+.toast{
+    position:fixed;
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#2ecc71;
+    color:white;
+    padding:15px 25px;
+    border-radius:12px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.3);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.5s, bottom 0.5s;
+    z-index:1000;
+}
+.toast.show{
+    opacity:1;
+    bottom:50px;
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login" id="login">
+<h1>🌿 Menta y Amor</h1>
+<input id="correo" placeholder="Correo">
+<input id="password" type="password" placeholder="Contraseña">
+<label><input type="checkbox" id="edad"> Confirmo que tengo 18 años</label>
+<label><input type="checkbox" id="robot"> No soy un robot</label>
+<button onclick="entrar()">Entrar</button>
+<p id="mensaje"></p>
+</div>
+
+<header>
+<div class="logo">🌿 Menta y Amor</div>
+<div id="iconoCarrito" onclick="abrirCarrito()">🛒 <span id="contadorCarrito">0</span></div>
+</header>
+
+<div class="container">
+<div class="producto">
+<h3>Aromatizante 30ml</h3>
+<img src="producto30ml.png">
+<p>$50 MXN</p>
+<button onclick="verProducto('Aromatizante 30ml',50,'producto30ml.png')">Ver producto</button>
+<button onclick="agregar('Aromatizante 30ml',50)">Agregar</button>
+</div>
+
+<div class="producto">
+<h3>Aromatizante 1L</h3>
+<img src="producto1l.png">
+<p>$150 MXN</p>
+<button onclick="verProducto('Aromatizante 1L',150,'producto1l.png')">Ver producto</button>
+<button onclick="agregar('Aromatizante 1L',150)">Agregar</button>
+</div>
+</div>
+
+<div class="carrito" id="carrito">
+<h2>Carrito</h2>
+<div id="lista"></div>
+<p id="total"></p>
+<button onclick="irPago()">Comprar</button>
+<button onclick="cerrarCarrito()">Cerrar</button>
+</div>
+
+<!-- PAGO MODAL -->
+<div class="pago" id="pago">
+  <div class="pago-contenido">
+    <h2>💳 Pago</h2>
+    <input id="direccion" placeholder="Dirección / País destino">
+    <input id="tarjeta" maxlength="16" placeholder="Tarjeta">
+    <input id="cvv" maxlength="3" placeholder="CVV">
+    <input type="date" id="fecha">
+    <br><br>
+    <button onclick="pagar()">Pagar</button>
+    <button onclick="cerrarPago()">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL PRODUCTO -->
+<div class="modalProducto" id="modalProducto">
+    <div class="modalContenido">
+        <h2 id="modalNombre"></h2>
+        <img id="modalImagen">
+        <p id="modalPrecio"></p>
+        <button onclick="cerrarModalProducto()">Cerrar</button>
+    </div>
+</div>
+
+<section class="reseñas">
+<h2>⭐ Opiniones</h2>
+<div id="listaReviews"></div>
+<h3>Deja tu reseña</h3>
+<input id="nombreReview" placeholder="Nombre">
+<select id="estrellas">
+<option value="1">⭐</option>
+<option value="2">⭐⭐</option>
+<option value="3">⭐⭐⭐</option>
+<option value="4">⭐⭐⭐⭐</option>
+<option value="5">⭐⭐⭐⭐⭐</option>
+</select>
+<input id="textoReview" placeholder="Tu reseña">
+<button onclick="guardarReview()">Publicar</button>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+let carrito=[];
+let usuarioActual=null;
+
+// --- Registrar admin automáticamente ---
+let usuarios=JSON.parse(localStorage.getItem("usuarios"))||{};
+if(!usuarios["willduran620@gmail.com"]){
+    usuarios["willduran620@gmail.com"]="contra17";
+    localStorage.setItem("usuarios",JSON.stringify(usuarios));
+    usuarioActual="willduran620@gmail.com";
+}
+
+// LOGIN
+function entrar(){
+    let correo=document.getElementById("correo").value;
+    let pass=document.getElementById("password").value;
+    let usuarios=JSON.parse(localStorage.getItem("usuarios"))||{};
+    if(usuarios[correo]){
+        if(usuarios[correo]!==pass){
+            mensaje.innerText="Contraseña incorrecta"; return;
+        }
+    }else{
+        usuarios[correo]=pass;
+        localStorage.setItem("usuarios",JSON.stringify(usuarios));
+    }
+    usuarioActual=correo;
+    login.style.display="none";
+}
+
+// CARRITO
+function agregar(nombre,precio){
+    carrito.push({nombre,precio});
+    document.getElementById("contadorCarrito").innerText=carrito.length;
+    mostrarToast(`Has agregado "${nombre}" al carrito 🛒`);
+}
+
+function abrirCarrito(){
+    let agrupados={}, total=0;
+    carrito.forEach(p=>{
+        if(!agrupados[p.nombre]) agrupados[p.nombre]={precio:p.precio,cantidad:0};
+        agrupados[p.nombre].cantidad++;
+    });
+    let html="", suma=0;
+    for(let p in agrupados){
+        let info=agrupados[p];
+        let sub=info.precio*info.cantidad;
+        suma+=sub;
+        html+=`<p>${p} x${info.cantidad} - $${sub}</p>`;
+    }
+    document.getElementById("lista").innerHTML=html;
+    document.getElementById("total").innerText="Total: $"+suma;
+    document.getElementById("carrito").style.display="block";
+}
+
+function cerrarCarrito(){document.getElementById("carrito").style.display="none";}
+function cerrarPago(){document.getElementById("pago").style.display="none";}
+
+function mostrarToast(txt){
+    let t=document.getElementById("toast");
+    t.innerText=txt;
+    t.classList.add("show");
+    setTimeout(()=>{t.classList.remove("show");},2000);
+}
+
+// VER PRODUCTO
+function verProducto(nombre, precio, img){
+    document.getElementById("modalNombre").innerText=nombre;
+    document.getElementById("modalPrecio").innerText="$"+precio;
+    document.getElementById("modalImagen").src=img;
+    let modal=document.getElementById("modalProducto");
+    modal.style.display="flex";
+    setTimeout(()=>modal.classList.add("show"),50); // animación entrada
+}
+function cerrarModalProducto(){
+    let modal=document.getElementById("modalProducto");
+    modal.classList.remove("show"); // animación salida
+    setTimeout(()=>modal.style.display="none",300);
+}
+
+// PAGO
+function irPago(){
+    if(carrito.length==0){mostrarToast("No hay productos en el carrito"); return;}
+    cerrarCarrito();
+    document.getElementById("pago").style.display="flex";
+}
+
+function pagar(){
+    if(tarjeta.value.length!=16){mostrarToast("Tarjeta inválida"); return;}
+    if(cvv.value.length!=3){mostrarToast("CVV inválido"); return;}
+    mostrarToast("Pago realizado con éxito ✅");
+    cerrarPago();
+    carrito=[]; document.getElementById("contadorCarrito").innerText="0";
+}
+
+// --- RESEÑAS CON TROLEO ---
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC7x-YoiGFlcFSCVG3Q0dMK_YXBVA-KzDw",
+  authDomain: "menta-y-amor.firebaseapp.com",
+  projectId: "menta-y-amor",
+  storageBucket: "menta-y-amor.firebasestorage.app",
+  messagingSenderId: "591609204180",
+  appId: "1:591609204180:web:f901f517f1fd4187121a41"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+
+// --- RESEÑAS CON TROLEO ---
+const fotosTroleo=[
+    "https://sl.bing.net/jOZ3IVmuBr2",
+    "https://sl.bing.net/g1t14nmz7Ia",
+    "https://sl.bing.net/ia40wTYIBcO",
+    "https://sl.bing.net/i7Xa9GtkUaO",
+    "https://sl.bing.net/bE2t7niJhKK"
+];
+
+function avatarCorreo(correo){
+    if(correo==="willduran620@gmail.com") return "https://api.dicebear.com/7.x/initials/svg?seed="+correo;
+    if(Math.random()<0.25){
+        const indice=Math.floor(Math.random()*fotosTroleo.length);
+        return fotosTroleo[indice];
+    }
+    return "https://api.dicebear.com/7.x/initials/svg?seed="+correo;
+}
+
+
+// 🔥 SOLO DEJAMOS ESTA FUNCIÓN (Firebase)
+function cargarReviews(){
+
+let contenedor=document.getElementById("listaReviews");
+contenedor.innerHTML="";
+
+db.collection("reviews")
+.orderBy("fecha","desc")
+.get()
+.then(snapshot=>{
+
+snapshot.forEach(doc=>{
+
+let r=doc.data();
+let estrellas="⭐".repeat(r.estrellas);
+
+contenedor.innerHTML+=`
+
+<div class="review">
+
+<img src="${avatarCorreo(r.correo)}">
+
+<div>
+
+<strong>${r.nombre}</strong>
+
+<div class="estrellas">${estrellas}</div>
+
+<p>${r.texto}</p>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+});
+
+}
+
+
+// 🔥 GUARDAR RESEÑA
+function guardarReview(){
+
+let nombre=document.getElementById("nombreReview").value;
+let texto=document.getElementById("textoReview").value;
+let estrellas=document.getElementById("estrellas").value;
+
+let correo=usuarioActual || "anonimo";
+
+if(nombre=="" || texto==""){
+mostrarToast("Completa los campos");
+return;
+}
+
+db.collection("reviews").add({
+
+nombre:nombre,
+correo:correo,
+texto:texto,
+estrellas:Number(estrellas),
+fecha:Date.now()
+
+})
+.then(()=>{
+
+document.getElementById("nombreReview").value="";
+document.getElementById("textoReview").value="";
+
+mostrarToast("Reseña publicada ⭐");
+
+cargarReviews();
+
+});
+
+}
+
+
+// 🔥 CARGAR AL INICIO
+setTimeout(cargarReviews,1000);
+
+</script>
+</body>
+</html>
