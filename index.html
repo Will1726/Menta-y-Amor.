@@ -17,7 +17,7 @@ body{
     position:fixed;
     width:100%;
     height:100%;
-    background:#27ae60;
+    background: linear-gradient(135deg,#27ae60,#145a32);
     display:flex;
     flex-direction:column;
     justify-content:center;
@@ -25,15 +25,77 @@ body{
     color:white;
     z-index:10;
 }
+
 .login h1{
-    font-size:60px;
+    font-size:50px;
     margin-bottom:20px;
 }
+
+.login{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background: linear-gradient(135deg,#27ae60,#145a32);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.login form{
+    animation: aparecer 0.6s ease;
+}
+
+.login form{
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    text-align:center;
+    color:#333;
+    width:300px;
+}
+
+@keyframes aparecer{
+    from{
+        transform: translateY(30px);
+        opacity:0;
+    }
+    to{
+        transform: translateY(0);
+        opacity:1;
+    }
+}
+
+.login form{
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    text-align:center;
+    color:#333;
+}
+
 .login input{
-    padding:10px;
-    margin:5px;
+    padding:12px;
+    margin:8px;
     border:none;
-    border-radius:6px;
+    border-radius:8px;
+    width:220px;
+}
+
+.login button{
+    background:white;
+    color:#27ae60;
+    font-weight:bold;
+    padding:10px 20px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.login button:hover{
+    background:#d5f5e3;
 }
 
 /* HEADER */
@@ -339,13 +401,16 @@ button:hover{
 
 <!-- LOGIN -->
 <div class="login" id="login">
-<h1>🌿 Menta y Amor</h1>
-<input id="correo" placeholder="Correo">
-<input id="password" type="password" placeholder="Contraseña">
-<label><input type="checkbox" id="edad"> Confirmo que tengo 18 años</label>
-<label><input type="checkbox" id="robot"> No soy un robot</label>
-<button onclick="entrar()">Entrar</button>
-<p id="mensaje"></p>
+  <form onsubmit="entrar(); return false;">
+    <h1>🌿 Menta y Amor</h1>
+
+    <input id="correo" placeholder="Correo"><br>
+    <input id="password" type="password" placeholder="Contraseña"><br>
+
+    <div class="g-recaptcha" data-sitekey="6Lew57AsAAAAADgg1BsO6onCeTqDDhRM-DJThuK6"></div>
+
+    <button type="submit">Entrar</button>
+  </form>
 </div>
 
 <header>
@@ -424,64 +489,156 @@ button:hover{
 
 <div class="toast" id="toast"></div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script>
-let carrito=[];
-let usuarioActual=null;
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+let usuarioActual = null;
 
-// --- Registrar admin automáticamente ---
-let usuarios=JSON.parse(localStorage.getItem("usuarios"))||{};
-if(!usuarios["willduran620@gmail.com"]){
-    usuarios["willduran620@gmail.com"]="contra17";
-    localStorage.setItem("usuarios",JSON.stringify(usuarios));
-    usuarioActual="willduran620@gmail.com";
+// actualizar contador al iniciar
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("contadorCarrito").innerText = carrito.length;
+});
+
+// CONFIG 
+const firebaseConfig = {
+  apiKey: "AIza...",
+  authDomain: "menta-y-amor.firebaseapp.com",
+  projectId: "menta-y-amor"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+// Admin
+function esAdmin(){
+    return usuarioActual === "willduran620@gmail.com";
 }
 
 // LOGIN
-usuarioActual = localStorage.getItem("sesion");
-if(usuarioActual){
-    document.getElementById("login").style.display="none";
-}
+firebase.auth().onAuthStateChanged(user => {
+    if(user){
+        usuarioActual = user.email;
+        document.getElementById("login").style.display = "none";
+    } else {
+        document.getElementById("login").style.display = "flex";
+    }
+});
+
+// FUNCIÓN ENTRAR
 function entrar(){
-    let correo=document.getElementById("correo").value;
-    let pass=document.getElementById("password").value;
+
+    let correo = document.getElementById("correo").value;
+    let pass = document.getElementById("password").value;
+
+    let captcha = grecaptcha.getResponse();
+
+    if(captcha.length === 0){
+        mostrarToast("Verifica el captcha");
+        return;
+    }
 
     if(correo=="" || pass==""){
         mostrarToast("Completa los datos");
         return;
     }
 
-    // guardamos solo sesión
-    usuarioActual=correo;
-    localStorage.setItem("sesion", correo);
+    firebase.auth().signInWithEmailAndPassword(correo, pass)
+    .then(userCredential => {
+    usuarioActual = userCredential.user.email;
+    mostrarToast("Bienvenido");
+    grecaptcha.reset();
+})
+    .catch(error => {
 
-    login.style.display="none";
+        if(error.code === "auth/user-not-found"){
+            firebase.auth().createUserWithEmailAndPassword(correo, pass)
+            .then(userCredential => {
+                usuarioActual = userCredential.user.email;
+                mostrarToast("Cuenta creada 🎉");
+            });
+        } 
+        else if(error.code === "auth/wrong-password"){
+            mostrarToast("Contraseña incorrecta");
+        }
+        else{
+            mostrarToast(error.message);
+        }
+    });
 }
 // CARRITO
 function agregar(nombre,precio){
-    carrito.push({nombre,precio});
-    document.getElementById("contadorCarrito").innerText=carrito.length;
-    mostrarToast(`Has agregado "${nombre}" al carrito 🛒`);
+
+    let productoExistente = carrito.find(p => p.nombre === nombre);
+
+    if(productoExistente){
+        productoExistente.cantidad += 1;
+    } else {
+        carrito.push({nombre,precio,cantidad:1});
+    }
+
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+
+    document.getElementById("contadorCarrito").innerText =
+        carrito.reduce((acc,p)=>acc+p.cantidad,0);
+
+    mostrarToast(`Agregado: ${nombre}`);
+}
+function abrirCarrito(){
+
+    let html="";
+    let total=0;
+
+    carrito.forEach((p,index)=>{
+        let sub = p.precio * p.cantidad;
+        total += sub;
+
+        html += `
+        <div style="margin-bottom:10px;">
+            <b>${p.nombre}</b><br>
+            $${p.precio} x ${p.cantidad} = $${sub}<br>
+
+            <button onclick="cambiarCantidad(${index}, -1)">➖</button>
+            <button onclick="cambiarCantidad(${index}, 1)">➕</button>
+            <button onclick="eliminarProducto(${index})">❌</button>
+        </div>
+        `;
+    });
+
+    document.getElementById("lista").innerHTML = html;
+    document.getElementById("total").innerText = "Total: $" + total;
+    document.getElementById("carrito").style.display = "block";
+}
+function cambiarCantidad(index, cambio){
+
+    carrito[index].cantidad += cambio;
+
+    if(carrito[index].cantidad <= 0){
+        carrito.splice(index,1);
+    }
+
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+
+    document.getElementById("contadorCarrito").innerText =
+        carrito.reduce((acc,p)=>acc+p.cantidad,0);
+
+    abrirCarrito();
 }
 
-function abrirCarrito(){
-    let agrupados={}, total=0;
-    carrito.forEach(p=>{
-        if(!agrupados[p.nombre]) agrupados[p.nombre]={precio:p.precio,cantidad:0};
-        agrupados[p.nombre].cantidad++;
-    });
-    let html="", suma=0;
-    for(let p in agrupados){
-        let info=agrupados[p];
-        let sub=info.precio*info.cantidad;
-        suma+=sub;
-        html+=`<p>${p} x${info.cantidad} - $${sub}</p>`;
-    }
-    document.getElementById("lista").innerHTML=html;
-    document.getElementById("total").innerText="Total: $"+suma;
-    document.getElementById("carrito").style.display="block";
+function eliminarProducto(index){
+    carrito.splice(index,1);
+
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+
+    document.getElementById("contadorCarrito").innerText =
+        carrito.reduce((acc,p)=>acc+p.cantidad,0);
+
+    abrirCarrito();
 }
 
 function cerrarCarrito(){document.getElementById("carrito").style.display="none";}
@@ -538,27 +695,21 @@ function irPago(){
 }
 
 function pagar(){
+
+    let tarjeta = document.getElementById("tarjeta");
+    let cvv = document.getElementById("cvv");
+
     if(tarjeta.value.length!=16){mostrarToast("Tarjeta inválida"); return;}
     if(cvv.value.length!=3){mostrarToast("CVV inválido"); return;}
+
     mostrarToast("Pago realizado con éxito ✅");
     cerrarPago();
-    carrito=[]; document.getElementById("contadorCarrito").innerText="0";
+
+    carrito = [];
+    localStorage.removeItem("carrito");
+
+    document.getElementById("contadorCarrito").innerText = "0";
 }
-
-// --- RESEÑAS CON TROLEO ---
-
-const firebaseConfig = {
-  apiKey: "AIzaSyC7x-YoiGFlcFSCVG3Q0dMK_YXBVA-KzDw",
-  authDomain: "menta-y-amor.firebaseapp.com",
-  projectId: "menta-y-amor",
-  storageBucket: "menta-y-amor.firebasestorage.app",
-  messagingSenderId: "591609204180",
-  appId: "1:591609204180:web:f901f517f1fd4187121a41"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
 
 // --- RESEÑAS CON TROLEO ---
 const fotosTroleo=[
@@ -695,35 +846,38 @@ setTimeout(()=>{
 // LIKE (sin repetir)
 function darLike(id){
 
-let user = usuarioActual || "anonimo";
-let ref = db.collection("reviews").doc(id);
+    let user = usuarioActual || "anonimo";
+    let ref = db.collection("reviews").doc(id);
 
-ref.get().then(doc=>{
-    let data = doc.data();
+    ref.get().then(doc=>{
+        let data = doc.data();
+        let likedBy = data.likedBy || [];
 
-    if(data.likedBy && data.likedBy.includes(user)){
-        mostrarToast("Ya diste like");
-        return;
-    }
+        if(likedBy.includes(user)){
+            // ❌ QUITAR LIKE
+            likedBy = likedBy.filter(u => u !== user);
 
-    ref.update({
-        likes: (data.likes || 0) + 1,
-        likedBy: [...(data.likedBy || []), user]
+            ref.update({
+                likes: (data.likes || 1) - 1,
+                likedBy: likedBy
+            });
+
+            mostrarToast("Like eliminado 💔");
+
+        } else {
+            // ❤️ DAR LIKE
+            likedBy.push(user);
+
+            ref.update({
+                likes: (data.likes || 0) + 1,
+                likedBy: likedBy
+            });
+
+            mostrarToast("Like agregado ❤️");
+        }
     });
-
-    let btn = document.getElementById("like-"+id);
-
-    if(btn){
-        btn.classList.add("like-anim");
-        btn.classList.add("liked");
-
-        setTimeout(()=>{
-            btn.classList.remove("like-anim");
-        },300);
-    }
-
-});
 }
+
 function responderReview(id){
 
 let input = document.getElementById("resp-"+id);
