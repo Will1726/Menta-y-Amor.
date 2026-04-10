@@ -508,9 +508,11 @@ document.addEventListener("DOMContentLoaded", () => {
 const firebaseConfig = {
   apiKey: "AIzaSyC7x-YoiGFlcFSCVG3Q0dMK_YXBVA-KzDw",
   authDomain: "menta-y-amor.firebaseapp.com",
-  projectId: "menta-y-amor"
+  projectId: "menta-y-amor",
+  storageBucket: "menta-y-amor.firebasestorage.app",
+ mensajesSenderId: "591609204180",
+  appId: "1:591609204180:web:f901f517f1fd4187121a41"}; InicializarFirebase const app = initializeApp(firebaseConfig);
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
