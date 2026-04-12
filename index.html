@@ -401,7 +401,7 @@ button:hover{
 
 <!-- LOGIN -->
 <div class="login" id="login">
-  <form onsubmit="entrar(); return false;">
+  <form onsubmit="event.preventDefault(); entrar();">
     <h1>🌿 Menta y Amor</h1>
 
     <input id="correo" placeholder="Correo"><br>
@@ -556,6 +556,8 @@ firebase.auth().onAuthStateChanged(user => {
 
 // FUNCIÓN ENTRAR
 function entrar(){
+    
+    console.log("Intentando login...");
 
     let correo = document.getElementById("correo").value;
     let pass = document.getElementById("password").value;
