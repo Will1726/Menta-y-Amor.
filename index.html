@@ -7,10 +7,18 @@
 <style>
 /* GLOBAL */
 body{
-    font-family: Arial;
+    font-family: 'Segoe UI', Arial;
     margin:0;
-    background: linear-gradient(135deg,#c8f7d4,#e9fff2);
-    background-attachment: fixed;
+    font-size:18px;
+
+    background: linear-gradient(120deg, #a8e6b0, #d4fcdf, #81c784, #4caf50);
+    background-size: 400% 400%;
+    animation: fondoAnimado 12s ease infinite;
+}
+@keyframes fondoAnimado{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
 }
 /* LOGIN */
 .login{
@@ -29,20 +37,6 @@ body{
 .login h1{
     font-size:50px;
     margin-bottom:20px;
-}
-
-.login{
-    position:fixed;
-    width:100%;
-    height:100%;
-    background: linear-gradient(135deg,#27ae60,#145a32);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-.login form{
-    animation: aparecer 0.6s ease;
 }
 
 .login form{
@@ -64,15 +58,6 @@ body{
         transform: translateY(0);
         opacity:1;
     }
-}
-
-.login form{
-    background:white;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.3);
-    text-align:center;
-    color:#333;
 }
 
 .login input{
@@ -102,10 +87,11 @@ body{
 header{
     background:#1e8449;
     color:white;
-    padding:15px;
+    padding:15px 30px;
     display:flex;
     justify-content:space-between;
     align-items:center;
+    box-shadow:0 5px 20px rgba(0,0,0,0.2);
 }
 .logo{
     font-size:26px;
@@ -122,38 +108,34 @@ header{
 }
 
 /* PRODUCTOS */
-<h2 class="titulo-seccion">🛍️ Productos</h2>
-
-<div class="container">
 .container{
     display:flex;
     justify-content:center;
     flex-wrap:wrap;
     gap:40px;
     padding:40px;
+    max-width:1200px;
+    margin:auto;
 }
 .producto{
     background:white;
-    padding:20px;
-    border-radius:15px;
+    padding:25px;
+    border-radius:18px;
     text-align:center;
-    width:250px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.1);
+    width:280px;
+
+    box-shadow:0 15px 30px rgba(0,0,0,0.15);
     transition:0.3s;
 }
 
-.producto:hover{
-    transform: translateY(-10px) scale(1.02);
-}
-
 .producto img{
-    width:160px;
-    margin-bottom:10px;
+    width:100%;
+    max-width:220px;
 }
 button{
     background: linear-gradient(135deg,#2ecc71,#27ae60);
     border:none;
-    padding:10px;
+    padding:12px 15px;
     border-radius:10px;
     color:white;
     cursor:pointer;
@@ -161,9 +143,11 @@ button{
     transition:0.3s;
     font-weight:bold;
 }
+
 button:hover{
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
+
 /* CARRITO */
 .carrito{
     position:fixed;
@@ -434,12 +418,6 @@ button:hover{
         text-align:center;
     }
 
-    .container{
-        flex-direction:column;
-        align-items:center;
-        padding:20px;
-    }
-
     .producto{
         width:90%;
     }
@@ -457,11 +435,17 @@ button:hover{
         font-size:14px;
     }
 }
+
 .hero{
-    .hero{
-    min-height:350px;
-    padding:40px 20px;
-    background: linear-gradient(135deg,#27ae60,#145a32);
+    min-height:450px;
+    padding:80px 20px;
+
+    background: linear-gradient(135deg, rgba(39,174,96,0.9), rgba(20,90,50,0.9)),
+                url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6');
+
+    background-size: cover;
+    background-position: center;
+
     color:white;
     display:flex;
     flex-direction:column;
@@ -471,15 +455,14 @@ button:hover{
 }
 
 .hero h1{
-    font-size:40px;
-    margin:0;
+    font-size:50px;
+    font-weight:900;
+    text-shadow:0 6px 20px rgba(0,0,0,0.5);
 }
 
 .hero p{
-    margin:10px 0;
-    font-size:18px;
+    font-size:22px;
 }
-
 .hero button{
     background:white;
     color:#27ae60;
@@ -515,36 +498,46 @@ button:hover{
     margin-top:30px;
     color:#145a32;
 }
-header{
-    background:#1e8449;
-    color:white;
-    padding:15px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    box-shadow:0 5px 15px rgba(0,0,0,0.2);
-}
-@media (max-width:600px){
+
+@media (max-width:900px){
+
     .hero h1{
-        font-size:26px;
+        font-size:30px;
     }
 
-    .hero p{
-        font-size:14px;
+    .producto{
+        width:90%;
     }
+}
+body{
+    font-size:18px;
+}
+.hero h1{
+    font-size:48px;
+    font-weight:800;
+}
 
-    button{
-        width:100%;
-    }
+.hero p{
+    font-size:20px;
+}
+h1{
+    font-size:48px;
+}
+
+h2{
+    font-size:32px;
+}
+
+h3{
+    font-size:22px;
+}
+
+p{
+    font-size:18px;
 }
 </style>
 </head>
 <body>
-<footer class="footer">
-    <p>🌿 Menta y Amor © 2026</p>
-    <p>Hecho con amor en México</p>
-</footer>
-
 
 <!-- LOGIN -->
 <div class="login" id="login">
@@ -604,6 +597,7 @@ header{
 <div id="lista"></div>
 <p id="total"></p>
 <button onclick="irPago()">Comprar</button>
+<button onclick="pagarStripe()">Pagar con tarjeta 💳</button>
 <button onclick="cerrarCarrito()">Cerrar</button>
 </div>
 
@@ -620,7 +614,6 @@ header{
     <button onclick="cerrarPago()">Cancelar</button>
   </div>
 </div>
-
 <!-- MODAL PRODUCTO -->
 <div class="modalProducto" id="modalProducto">
     <div class="modalContenido">
@@ -664,7 +657,8 @@ let usuarioActual = null;
 
 // actualizar contador al iniciar
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("contadorCarrito").innerText = carrito.length;
+    document.getElementById("contadorCarrito").innerText =
+    carrito.reduce((acc,p)=>acc+p.cantidad,0);
 });
 
 // CONFIG 
@@ -767,7 +761,7 @@ function entrar(){
         firebase.auth().createUserWithEmailAndPassword(correo, pass)
         .then(userCredential => {
             usuarioActual = userCredential.user.email;
-            mostrarToast("Cuenta creada 🎉 Bienvenido");
+            mostrarToast("Cuenta creada exitosamente, Bienvenido");
             grecaptcha.reset();
         })
         .catch(err => {
@@ -903,28 +897,50 @@ function cerrarModalProducto(){
 
 // PAGO
 function irPago(){
-    if(carrito.length==0){mostrarToast("No hay productos en el carrito"); return;}
-    cerrarCarrito();
-    document.getElementById("pago").style.display="flex";
-}
 
-function pagar(){
+    if(carrito.length==0){
+        mostrarToast("No hay productos en el carrito");
+        return;
+    }
 
-    let tarjeta = document.getElementById("tarjeta");
-    let cvv = document.getElementById("cvv");
+    let total = carrito.reduce((acc,p)=>acc + (p.precio * p.cantidad),0);
 
-    if(tarjeta.value.length!=16){mostrarToast("Tarjeta inválida"); return;}
-    if(cvv.value.length!=3){mostrarToast("CVV inválido"); return;}
+    let resumen = carrito.map(p => 
+        `${p.nombre} x${p.cantidad} = $${p.precio * p.cantidad}`
+    ).join("\n");
 
-    mostrarToast("Pago realizado con éxito ✅");
-    cerrarPago();
+    let confirmar = confirm(
+        "Resumen de compra:\n\n" +
+        resumen +
+        "\n\nTotal: $" + total +
+        "\n\n¿Confirmar compra?"
+    );
+
+    if(!confirmar) return;
+
+    mostrarToast("Pago procesado correctamente 💳✨");
 
     carrito = [];
     localStorage.removeItem("carrito");
 
     document.getElementById("contadorCarrito").innerText = "0";
-}
 
+}
+function pagarStripe(){
+
+    if(carrito.length == 0){
+        mostrarToast("No hay productos en el carrito");
+        return;
+    }
+
+    let total = carrito.reduce((acc,p)=>acc + (p.precio * p.cantidad),0);
+
+    let confirmar = confirm("Total a pagar: $" + total + " MXN\n\n¿Ir a pagar con tarjeta?");
+
+    if(!confirmar) return;
+
+    window.location.href = "https://buy.stripe.com/test_5kQdR25uHanz3EK8Fr6c001";
+}
 // --- RESEÑAS CON TROLEO ---
 const fotosTroleo=[
     "https://sl.bing.net/jOZ3IVmuBr2",
@@ -1167,5 +1183,11 @@ db.collection("reviews").add({
 // CARGAR AL INICIO
 setTimeout(cargarReviews,1000);
 </script>
+<!-- TODO el contenido -->
+
+<footer class="footer">
+    <p>🌿 Menta y Amor © 2026</p>
+    <p>Hecho con amor en México</p>
+</footer>
 </body>
 </html>
